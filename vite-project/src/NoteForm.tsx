@@ -6,9 +6,11 @@ import { NoteData, Tag } from "./App";
 
 type NoteFormProps = {
     onSubmit: (data: NoteData) => void
+    onAddTag: (tag: Tag) => void
+    availableTags: Tag[]
 }
 
-export function NoteForm({ onSubmit }: NoteFormProps) {
+export function NoteForm({ onSubmit, onAddTag, availableTags}: NoteFormProps) {
     const titleRef = useRef<HTMLInputElement>(null)
     const markdownRef = useRef<HTMLTextAreaElement>(null)
     const [selectedTags, setSelectedTags] = useState<Tag[]>([])
@@ -19,6 +21,10 @@ export function NoteForm({ onSubmit }: NoteFormProps) {
             markdown: markdownRef.current!.value,
             tags: []
         })
+    }
+
+    function uuidv4() {
+        throw new Error("Function not implemented.");
     }
 
     return (
@@ -34,8 +40,17 @@ export function NoteForm({ onSubmit }: NoteFormProps) {
                 <Col>
                     <Form.Group controlId="tags">
                         <Form.Label>Tags</Form.Label>
-                        <CreatableReactSelect value={selectedTags.map(tag => {
+                        <CreatableReactSelect onCreateOption={
+                            label => {
+                                const newTag = { id: uuidv4(), label }
+                                onAddTag(newTag)
+                                setSelectedTags(prev => [...prev, newTag])
+                            }
+                        } value={selectedTags.map(tag => {
                             return { label: tag.label, value: tag.id}
+                        })}
+                        options={availableTags.map(tag =>{
+                            return { label: tag.label, value: tag.id }
                         })} 
                         onChange={tags => {
                             setSelectedTags(tags.map(tag => {
